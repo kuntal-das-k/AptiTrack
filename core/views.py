@@ -25,18 +25,20 @@ from .forms import SignupForm, LoginForm, ProfileForm, QuizConfigForm
 
 def home_view(request):
     """Landing page with platform overview."""
-    categories = Category.objects.annotate(
-        question_count=Count('questions')
-    )
-    total_questions = Question.objects.count()
-    total_users = UserProfile.objects.count()
-    total_attempts = QuizAttempt.objects.count()
-    companies = CompanyTag.objects.annotate(
-        question_count=Count('questions')
-    )[:8]
-
-    # Top performers for homepage
-    top_users = UserProfile.objects.select_related('user').order_by('-total_xp')[:5]
+    try:
+        categories = Category.objects.annotate(
+            question_count=Count('questions')
+        )
+        total_questions = Question.objects.count()
+        total_users = UserProfile.objects.count()
+        total_attempts = QuizAttempt.objects.count()
+        companies = CompanyTag.objects.annotate(
+            question_count=Count('questions')
+        )[:8]
+        top_users = UserProfile.objects.select_related('user').order_by('-total_xp')[:5]
+    except Exception:
+        # Tables don't exist yet — redirect to setup
+        return redirect('setup')
 
     context = {
         'categories': categories,
@@ -47,6 +49,41 @@ def home_view(request):
         'top_users': top_users,
     }
     return render(request, 'core/home.html', context)
+
+
+def setup_view(request):
+    """Run migrations and seed data for first-time deployment."""
+    from django.core.management import call_command
+    from io import StringIO
+    output = StringIO()
+    try:
+        call_command('migrate', '--noinput', stdout=output)
+        migrate_output = output.getvalue()
+    except Exception as e:
+        migrate_output = f"Migration error: {e}"
+
+    seed_output = ""
+    try:
+        seed_out = StringIO()
+        call_command('seed_data', stdout=seed_out)
+        seed_output = seed_out.getvalue()
+    except Exception as e:
+        seed_output = f"Seed skipped: {e}"
+
+    html = f"""
+    <html><head><title>AptiTrack Setup</title>
+    <style>body{{background:#030303;color:#fff;font-family:monospace;padding:40px;}}
+    pre{{background:#111;padding:20px;border-radius:8px;overflow:auto;}}
+    a{{color:#8b5cf6;font-size:18px;}}</style></head>
+    <body>
+    <h1>⚡ AptiTrack Setup Complete</h1>
+    <h3>Migration Output:</h3><pre>{migrate_output}</pre>
+    <h3>Seed Data Output:</h3><pre>{seed_output}</pre>
+    <br><a href="/">→ Go to Homepage</a>
+    </body></html>
+    """
+    from django.http import HttpResponse
+    return HttpResponse(html)
 
 
 # ─── Authentication ───────────────────────────────────────────

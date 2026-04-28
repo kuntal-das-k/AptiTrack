@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     # Landing
     path('', views.home_view, name='home'),
+    path('setup/', views.setup_view, name='setup'),
 
     # Auth
     path('signup/', views.signup_view, name='signup'),
