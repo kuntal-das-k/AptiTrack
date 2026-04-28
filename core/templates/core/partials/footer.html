@@ -1,0 +1,43 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col" style="text-align:left;">
+        <h3 class="font-serif" style="font-size:2rem;color:#fff;margin-bottom:1rem;line-height:1;">AptiTrack<br>Platform</h3>
+        <p style="font-size:0.9rem;max-width:250px;">The next generation aptitude preparation platform for top-tier candidates.</p>
+      </div>
+      <div class="footer-col" style="text-align:left;">
+        <h4>Practice</h4>
+        <ul>
+          <li><a href="{% url 'practice' %}?category=quantitative-aptitude">Quantitative</a></li>
+          <li><a href="{% url 'practice' %}?category=logical-reasoning">Logical Reasoning</a></li>
+          <li><a href="{% url 'practice' %}?category=verbal-ability">Verbal Ability</a></li>
+          <li><a href="{% url 'practice' %}?category=data-interpretation">Data Interpretation</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" style="text-align:left;">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="{% url 'company_list' %}">Companies</a></li>
+          <li><a href="{% url 'quiz_start' %}">Mock Tests</a></li>
+          <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+          <li><a href="{% url 'admin:index' %}">Admin Access</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" style="text-align:left;">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'profile' %}">Profile</a></li>
+          <li><a href="{% url 'bookmarks' %}">Bookmarks</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2024 AptiTrack. All rights reserved.</div>
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        All Systems Operational
+      </div>
+    </div>
+  </div>
+</footer>

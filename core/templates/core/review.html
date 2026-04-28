@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+{% block title %}Review Mistakes{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>🔄 Review Mistakes</h1>
+      <p>{{ total_wrong }} question{{ total_wrong|pluralize }} to review</p>
+    </div>
+    {% for answer in wrong_answers %}
+    <div class="card" style="margin-bottom:.75rem;padding:1.25rem;">
+      <div class="q-meta mb-1">
+        <span class="badge badge-{{ answer.question.difficulty }}">{{ answer.question.difficulty }}</span>
+        <span class="badge" style="background:{{ answer.question.category.color }}22;color:{{ answer.question.category.color }};">{{ answer.question.category.name }}</span>
+      </div>
+      <p style="margin:.5rem 0;line-height:1.6;">{{ answer.question.text }}</p>
+      <p style="font-size:.9rem;" class="text-danger">Your answer: {{ answer.selected_answer|upper }})</p>
+      <p style="font-size:.9rem;" class="text-success">Correct: {{ answer.question.correct_answer|upper }})</p>
+      {% if answer.question.explanation %}
+      <div class="explanation-box" style="margin-top:.75rem;">
+        <h4>💡 Explanation</h4>
+        <p>{{ answer.question.explanation }}</p>
+      </div>
+      {% endif %}
+      <a href="{% url 'question_detail' answer.question.pk %}" class="btn btn-ghost btn-sm mt-2">Try Again →</a>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon">🎉</div>
+      <h3>No mistakes to review!</h3>
+      <p>Keep practicing to improve even more</p>
+    </div>
+    {% endfor %}
+    {% if wrong_answers.has_other_pages %}
+    <div class="pagination">
+      {% if wrong_answers.has_previous %}<a href="?page={{ wrong_answers.previous_page_number }}">← Prev</a>{% endif %}
+      {% if wrong_answers.has_next %}<a href="?page={{ wrong_answers.next_page_number }}">Next →</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

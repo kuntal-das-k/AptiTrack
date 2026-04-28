@@ -1,0 +1,127 @@
+{% extends "core/base.html" %}
+{% load static core_tags humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header flex-between">
+      <div>
+        <h1>📊 Dashboard</h1>
+        <p>Welcome back, {{ user.username }}!</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <div class="streak-display card" style="padding:.75rem 1.5rem;display:flex;align-items:center;gap:.5rem;">
+          <span class="streak-fire">🔥</span>
+          <div>
+            <div style="font-size:1.5rem;font-weight:800;">{{ profile.streak_count }}</div>
+            <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;">Day Streak</div>
+          </div>
+        </div>
+        <div class="card" style="padding:.75rem 1.5rem;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:800;color:var(--accent);">{{ profile.total_xp|intcomma }}</div>
+          <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;">Total XP</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="dashboard-grid">
+      <div class="card stat-card">
+        <div class="stat-icon" style="background:rgba(59,130,246,.15);">🎯</div>
+        <div class="stat-value" style="color:var(--accent);">{{ accuracy }}%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,.15);">📝</div>
+        <div class="stat-value" style="color:var(--success);">{{ total_attempted }}</div>
+        <div class="stat-label">Attempted</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon" style="background:rgba(139,92,246,.15);">✅</div>
+        <div class="stat-value" style="color:var(--purple);">{{ total_correct }}</div>
+        <div class="stat-label">Correct</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,.15);">🏆</div>
+        <div class="stat-value" style="color:var(--warning);">{{ total_quizzes }}</div>
+        <div class="stat-label">Quizzes Taken</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid-2 mb-3">
+      <div class="card chart-card">
+        <h3>📡 Category Performance</h3>
+        <div class="chart-container"><canvas id="radar-chart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>📊 Difficulty Breakdown</h3>
+        <div class="chart-container"><canvas id="difficulty-chart"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2 mb-3">
+      <div class="card chart-card">
+        <h3>📈 Accuracy Trend</h3>
+        <div class="chart-container"><canvas id="activity-chart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>🍩 Questions by Category</h3>
+        <div class="chart-container"><canvas id="category-doughnut"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Topic Strengths & Recommendations -->
+    <div class="dashboard-two-col">
+      <div class="card">
+        <h3 style="font-weight:700;margin-bottom:1rem;">📋 Topic Breakdown</h3>
+        {% for cs in category_stats %}
+        <div style="margin-bottom:1rem;">
+          <div class="flex-between mb-1">
+            <span style="font-weight:600;">{{ cs.icon }} {{ cs.name }}</span>
+            <span class="text-muted">{{ cs.correct }}/{{ cs.total }} ({{ cs.accuracy }}%)</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width:{{ cs.accuracy }}%;background:{{ cs.color }};"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div class="card mb-2">
+          <h3 style="font-weight:700;margin-bottom:1rem;">💡 Recommendations</h3>
+          {% for rec in recommendations %}
+          <div class="recommendation-item">
+            <span class="rec-icon">📌</span>
+            <span style="font-size:.9rem;">{{ rec }}</span>
+          </div>
+          {% empty %}
+          <p class="text-muted">Great job! Keep practicing to unlock insights.</p>
+          {% endfor %}
+        </div>
+        <div class="card">
+          <h3 style="font-weight:700;margin-bottom:.75rem;">⚡ Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:.5rem;">
+            <a href="{% url 'quiz_start' %}" class="btn btn-primary btn-block">Start Quiz</a>
+            <a href="{% url 'practice' %}" class="btn btn-secondary btn-block">Practice</a>
+            <a href="{% url 'bookmarks' %}" class="btn btn-ghost btn-block">Bookmarks</a>
+            <a href="{% url 'review' %}" class="btn btn-ghost btn-block">Review Mistakes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'core/js/dashboard.js' %}"></script>
+<script>
+  const catData = {{ category_stats_json|safe }};
+  const diffData = {{ difficulty_stats_json|safe }};
+  const actData = {{ activity_data_json|safe }};
+  initDashboardCharts(catData, diffData, actData);
+</script>
+{% endblock %}

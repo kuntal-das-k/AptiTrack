@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>📚 Categories</h1>
+      <p>Choose a category to start practicing</p>
+    </div>
+    <div class="grid-2">
+      {% for item in category_data %}
+      <div class="card category-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="cat-icon">{{ item.category.icon }}</div>
+            <h3>{{ item.category.name }}</h3>
+            <p class="text-muted" style="font-size:.85rem;margin-top:.25rem;">{{ item.category.description }}</p>
+          </div>
+          <span class="badge badge-accent">{{ item.question_count }} Q</span>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:1rem;">
+          <span class="badge badge-easy">{{ item.easy_count }} Easy</span>
+          <span class="badge badge-medium">{{ item.medium_count }} Medium</span>
+          <span class="badge badge-hard">{{ item.hard_count }} Hard</span>
+        </div>
+        {% if user.is_authenticated and item.user_attempted > 0 %}
+        <div style="margin-top:1rem;">
+          <div class="flex-between" style="font-size:.8rem;margin-bottom:.25rem;">
+            <span class="text-muted">Your progress</span>
+            <span>{{ item.user_accuracy }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width:{{ item.user_accuracy }}%;background:{{ item.category.color }};"></div>
+          </div>
+        </div>
+        {% endif %}
+        <div style="display:flex;gap:.5rem;margin-top:1.25rem;">
+          <a href="{% url 'practice' %}?category={{ item.category.slug }}" class="btn btn-secondary btn-sm">Practice</a>
+          <a href="{% url 'quiz_start' %}?category={{ item.category.slug }}" class="btn btn-primary btn-sm">Start Quiz</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

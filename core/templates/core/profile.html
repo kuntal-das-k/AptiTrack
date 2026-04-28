@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+{% load core_tags %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>👤 My Profile</h1>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-bottom:1.25rem;font-weight:700;">Edit Profile</h3>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="form-group">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+      <div>
+        <div class="card stat-card mb-2">
+          <div class="stat-icon" style="background:rgba(59,130,246,.15);">🎯</div>
+          <div class="stat-value">{{ accuracy }}%</div>
+          <div class="stat-label">Overall Accuracy</div>
+        </div>
+        <div class="card stat-card mb-2">
+          <div class="stat-icon" style="background:rgba(16,185,129,.15);">📝</div>
+          <div class="stat-value">{{ total_attempted }}</div>
+          <div class="stat-label">Questions Attempted</div>
+        </div>
+        <div class="card stat-card mb-2">
+          <div class="stat-icon" style="background:rgba(139,92,246,.15);">⚡</div>
+          <div class="stat-value">{{ profile.total_xp }}</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon" style="background:rgba(245,158,11,.15);">🔥</div>
+          <div class="stat-value">{{ profile.streak_count }} day{{ profile.streak_count|pluralize }}</div>
+          <div class="stat-label">Current Streak</div>
+        </div>
+      </div>
+    </div>
+    {% if recent_attempts %}
+    <div class="card mt-3">
+      <h3 style="margin-bottom:1rem;font-weight:700;">Recent Activity</h3>
+      {% for attempt in recent_attempts %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;{% if not forloop.last %}border-bottom:1px solid var(--border);{% endif %}">
+        <div>
+          <span style="font-weight:600;">{{ attempt.score }}/{{ attempt.total_questions }}</span>
+          <span class="text-muted" style="margin-left:.5rem;">{{ attempt.accuracy }}%</span>
+          {% if attempt.category %}<span class="badge badge-accent" style="margin-left:.5rem;">{{ attempt.category.name }}</span>{% endif %}
+        </div>
+        <span class="text-muted" style="font-size:.8rem;">{{ attempt.started_at|timesince }} ago</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "core/base.html" %}
+{% block title %}Quiz Results{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container" style="max-width:800px;">
+    <div class="text-center mb-3">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:1rem;">Quiz Complete! 🎉</h1>
+      <div class="result-ring card" style="--pct: {{ attempt.accuracy }}%;">
+        <div class="ring-text">
+          <div class="result-score">{{ attempt.score }}/{{ attempt.total_questions }}</div>
+          <div class="text-muted">{{ attempt.accuracy }}% accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-success">{{ correct_count }}</div>
+        <div class="stat-label">Correct</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value text-danger">{{ wrong_count }}</div>
+        <div class="stat-label">Wrong</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value text-warning">{{ unanswered }}</div>
+        <div class="stat-label">Unanswered</div>
+      </div>
+    </div>
+
+    <div class="card mb-2" style="text-align:center;">
+      <span class="badge badge-accent" style="font-size:.9rem;padding:.4rem 1rem;">+{{ attempt.xp_earned }} XP earned</span>
+      <span class="text-muted" style="margin-left:1rem;">Time: {{ attempt.time_formatted }}</span>
+    </div>
+
+    <h3 style="margin:2rem 0 1rem;font-weight:700;">📋 Answer Review</h3>
+    {% for answer in answers %}
+    <div class="card" style="margin-bottom:.75rem;padding:1.25rem;">
+      <div class="flex-between mb-1">
+        <span class="badge badge-{{ answer.question.difficulty }}">{{ answer.question.difficulty }}</span>
+        {% if answer.is_correct %}
+        <span class="badge badge-easy">✓ Correct</span>
+        {% else %}
+        <span class="badge badge-hard">✗ Wrong</span>
+        {% endif %}
+      </div>
+      <p style="margin:.75rem 0;line-height:1.6;">{{ answer.question.text }}</p>
+      <div style="font-size:.9rem;">
+        <p>Your answer: <strong {% if not answer.is_correct %}class="text-danger"{% endif %}>{{ answer.selected_answer|upper }}) 
+          {% if answer.selected_answer == 'a' %}{{ answer.question.option_a }}{% elif answer.selected_answer == 'b' %}{{ answer.question.option_b }}{% elif answer.selected_answer == 'c' %}{{ answer.question.option_c }}{% else %}{{ answer.question.option_d }}{% endif %}
+        </strong></p>
+        {% if not answer.is_correct %}
+        <p class="text-success">Correct: {{ answer.question.correct_answer|upper }}) 
+          {% if answer.question.correct_answer == 'a' %}{{ answer.question.option_a }}{% elif answer.question.correct_answer == 'b' %}{{ answer.question.option_b }}{% elif answer.question.correct_answer == 'c' %}{{ answer.question.option_c }}{% else %}{{ answer.question.option_d }}{% endif %}
+        </p>
+        {% endif %}
+        {% if answer.question.explanation %}
+        <div class="explanation-box" style="margin-top:.75rem;">
+          <h4>💡 Explanation</h4>
+          <p>{{ answer.question.explanation }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="flex-between mt-3">
+      <a href="{% url 'quiz_start' %}" class="btn btn-primary">Take Another Quiz</a>
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

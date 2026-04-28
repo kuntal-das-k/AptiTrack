@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+{% block title %}Start Quiz{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container" style="max-width:700px;">
+    <div class="page-header text-center">
+      <h1>🎯 Configure Your Quiz</h1>
+      <p>Set up your quiz parameters</p>
+    </div>
+    <div class="card" style="padding:2rem;">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if form.initial.category == cat.slug %}selected{% endif %}>{{ cat.icon }} {{ cat.name }} ({{ cat.question_count }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company</label>
+          <select name="company" class="form-select">
+            <option value="">All Companies</option>
+            {% for comp in companies %}
+            <option value="{{ comp.slug }}" {% if form.initial.company == comp.slug %}selected{% endif %}>{{ comp.name }} ({{ comp.question_count }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Difficulty</label>
+            {{ form.difficulty }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Number of Questions</label>
+            {{ form.num_questions }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time Limit</label>
+          {{ form.time_limit }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block mt-2">🚀 Start Quiz</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

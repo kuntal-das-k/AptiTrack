@@ -1,0 +1,142 @@
+{% extends "core/base.html" %}
+{% load humanize %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero stagger-1">
+  <div class="hero-content container">
+    <h1 class="font-serif">Master Aptitude.<br>Ace Every <span class="text-shimmer">Test.</span></h1>
+    <p>Practice quantitative, logical, verbal and data interpretation questions. Track your progress and compete on the global leaderboard.</p>
+    <div class="hero-actions stagger-2">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn-shiny">
+          <div class="btn-shiny-inner">Access Dashboard</div>
+        </a>
+        <a href="{% url 'quiz_start' %}" class="btn btn-ghost" style="padding:1rem 2.5rem;border-radius:9999px;">Start Mock Test</a>
+      {% else %}
+        <a href="{% url 'signup' %}" class="btn-shiny">
+          <div class="btn-shiny-inner">Initialize Profile</div>
+        </a>
+        <a href="{% url 'practice' %}" class="btn btn-ghost" style="padding:1rem 2.5rem;border-radius:9999px;">Explore Database</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrapper stagger-3">
+  <div class="ticker-track">
+    <!-- Duplicate sets for infinite scroll -->
+    {% for i in "123" %}
+    <div class="ticker-item">
+      <span class="label-mono text-muted">Questions Logged</span>
+      <span class="val" style="color:var(--accent-cyan);">{{ total_questions|intcomma }}</span>
+    </div>
+    <div class="ticker-item">
+      <span class="label-mono text-muted">Active Users</span>
+      <span class="val">{{ total_users|intcomma }}</span>
+    </div>
+    <div class="ticker-item">
+      <span class="label-mono text-muted">Total Attempts</span>
+      <span class="val" style="color:var(--accent);">{{ total_attempts|intcomma }}</span>
+    </div>
+    <div class="ticker-item">
+      <span class="label-mono text-muted">System Status</span>
+      <span class="val" style="color:var(--success);">OPTIMAL</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<section class="feature-section stagger-4">
+  <div class="container">
+    <div class="page-header">
+      <h2 class="font-serif" style="font-size:3rem;">Core Modules</h2>
+      <p>Targeted practice across all cognitive domains</p>
+    </div>
+    <div class="grid-3">
+      {% for cat in categories|slice:":3" %}
+      <a href="{% url 'practice' %}?category={{ cat.slug }}" class="card feature-card" style="text-decoration:none;color:inherit;display:block;">
+        <div class="icon-box">{{ cat.icon }}</div>
+        <h3 class="font-serif">{{ cat.name }}</h3>
+        <p>{{ cat.description|default:"Enhance your skills with our curated question bank." }}</p>
+        <div class="mt-3">
+          <span class="badge badge-accent">{{ cat.question_count }} Qs Available</span>
+        </div>
+      </a>
+      {% endfor %}
+      {% if categories|length > 3 %}
+      <a href="{% url 'categories' %}" class="card feature-card" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center;text-align:center;">
+        <div>
+          <div class="icon-box" style="margin:0 auto 1.5rem;">+</div>
+          <h3 class="font-serif">View All Categories</h3>
+        </div>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="feature-section">
+  <div class="container text-center">
+    <h2 class="font-serif" style="font-size:3rem;margin-bottom:2rem;">System Architecture</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-controls">
+          <span class="r"></span><span class="y"></span><span class="g"></span>
+        </div>
+        <div class="code-title">engine.py</div>
+        <div class="code-title" style="cursor:pointer;" title="Copy code">📋</div>
+      </div>
+      <div class="code-body">
+<pre><code><span class="c-violet">import</span> <span class="c-cyan">AptiTrack</span>
+
+<span class="c-grey"># Initialize evaluation engine</span>
+<span class="c-violet">engine</span> = AptiTrack.<span class="c-cyan">EvaluationEngine</span>(
+    mode=<span class="c-emerald">'adaptive'</span>,
+    strict_timing=<span class="c-violet">True</span>
+)
+
+<span class="c-grey"># Load target user profile</span>
+<span class="c-violet">profile</span> = engine.load_profile(user_id)
+
+<span class="c-violet">def</span> <span class="c-cyan">start_session</span>(profile):
+    <span class="c-violet">if</span> profile.ready_for_test():
+        <span class="c-grey"># Compile mock test with AI-driven selection</span>
+        <span class="c-violet">quiz</span> = engine.compile_test(
+            difficulty=profile.current_level,
+            companies=profile.target_companies
+        )
+        <span class="c-violet">return</span> quiz.execute()
+    <span class="c-violet">return</span> <span class="c-emerald">"Practice required."</span>
+</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if top_users %}
+<section class="feature-section" style="padding-top:0;">
+  <div class="container">
+    <div class="page-header text-center">
+      <h2 class="font-serif" style="font-size:3rem;">Top Operators</h2>
+    </div>
+    <div class="card" style="max-width:600px;margin:0 auto;background:rgba(255,255,255,0.02);">
+      {% for profile in top_users %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 0;{% if not forloop.last %}border-bottom:1px solid var(--border);{% endif %}">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <span class="rank-badge">{{ forloop.counter }}</span>
+          <span style="font-weight:600;font-family:monospace;">@{{ profile.user.username }}</span>
+        </div>
+        <span class="badge badge-accent">{{ profile.total_xp|intcomma }} XP</span>
+      </div>
+      {% endfor %}
+      <div class="text-center mt-3">
+        <a href="{% url 'leaderboard' %}" class="btn btn-ghost btn-sm" style="border-radius:9999px;">View Full Leaderboard →</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

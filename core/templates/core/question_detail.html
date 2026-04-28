@@ -1,0 +1,112 @@
+{% extends "core/base.html" %}
+{% block title %}Question #{{ question.pk }}{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container" style="max-width:800px;">
+    <div class="flex-between mb-2">
+      <a href="{% url 'practice' %}?category={{ question.category.slug }}" class="btn btn-ghost btn-sm">← Back to Practice</a>
+      {% if user.is_authenticated %}
+      <button class="bookmark-btn {% if is_bookmarked %}active{% endif %}" data-question-id="{{ question.pk }}" style="font-size:1.5rem;">
+        {% if is_bookmarked %}★{% else %}☆{% endif %}
+      </button>
+      {% endif %}
+    </div>
+
+    <div class="card question-detail">
+      <div class="q-meta mb-2">
+        <span class="badge badge-{{ question.difficulty }}">{{ question.difficulty }}</span>
+        <span class="badge" style="background:{{ question.category.color }}22;color:{{ question.category.color }};">{{ question.category.name }}</span>
+        {% for company in question.companies.all %}
+        <span class="company-tag">{{ company.name }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="q-text">{{ question.text }}</div>
+
+      <div id="options-container">
+        <ul class="options-list">
+
+          <li class="option-item" data-answer="a" onclick="selectPracticeAnswer('a', {{ question.pk }})">
+            <span class="option-letter">A</span>
+            <span>{{ question.option_a }}</span>
+          </li>
+          <li class="option-item" data-answer="b" onclick="selectPracticeAnswer('b', {{ question.pk }})">
+            <span class="option-letter">B</span>
+            <span>{{ question.option_b }}</span>
+          </li>
+          <li class="option-item" data-answer="c" onclick="selectPracticeAnswer('c', {{ question.pk }})">
+            <span class="option-letter">C</span>
+            <span>{{ question.option_c }}</span>
+          </li>
+          <li class="option-item" data-answer="d" onclick="selectPracticeAnswer('d', {{ question.pk }})">
+            <span class="option-letter">D</span>
+            <span>{{ question.option_d }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div id="result-section" style="display:none;">
+        <div id="explanation-box" class="explanation-box">
+          <h4>💡 Explanation</h4>
+          <p>{{ question.explanation }}</p>
+        </div>
+      </div>
+
+      <div class="flex-between mt-3" style="font-size:.8rem;color:var(--text-muted);">
+        <span>Attempted {{ question.times_attempted }} times</span>
+        <span>Success rate: {{ question.success_rate }}%</span>
+      </div>
+    </div>
+
+    {% if related_questions %}
+    <h3 style="margin-top:2rem;margin-bottom:1rem;font-weight:700;">Related Questions</h3>
+    {% for rq in related_questions %}
+    <a href="{% url 'question_detail' rq.pk %}" class="card question-card" style="display:block;text-decoration:none;color:inherit;margin-bottom:.75rem;">
+      <div class="q-meta">
+        <span class="badge badge-{{ rq.difficulty }}">{{ rq.difficulty }}</span>
+      </div>
+      <div class="q-text">{{ rq.text|truncatechars:120 }}</div>
+    </a>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let answered = false;
+function selectPracticeAnswer(answer, questionId) {
+  if (answered) return;
+  answered = true;
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  
+  // Highlight selected
+  document.querySelectorAll('.option-item').forEach(o => o.style.pointerEvents = 'none');
+  const selected = document.querySelector(`.option-item[data-answer="${answer}"]`);
+  selected.classList.add('selected');
+
+  fetch(`/question/${questionId}/`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `answer=${answer}&time_spent=0`
+  })
+  .then(r => r.json())
+  .then(data => {
+    // Show correct/wrong
+    const correctOpt = document.querySelector(`.option-item[data-answer="${data.correct_answer}"]`);
+    correctOpt.classList.add('correct');
+    if (!data.correct) selected.classList.add('wrong');
+    
+    document.getElementById('result-section').style.display = 'block';
+    if (data.xp > 0) {
+      const xpBadge = document.createElement('span');
+      xpBadge.className = 'badge badge-accent';
+      xpBadge.style.marginLeft = '1rem';
+      xpBadge.textContent = `+${data.xp} XP`;
+      document.getElementById('explanation-box').querySelector('h4').appendChild(xpBadge);
+    }
+  });
+}
+</script>
+{% endblock %}

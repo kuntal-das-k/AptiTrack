@@ -1,0 +1,38 @@
+{% load static %}
+<nav class="navbar">
+  <div class="container">
+    <a href="{% url 'home' %}" class="navbar-brand">
+      <div class="logo-icon-sm"></div>
+      <span class="font-serif">AptiTrack</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{% url 'practice' %}" class="{% if request.resolver_match.url_name == 'practice' %}active{% endif %}">Practice</a></li>
+      <li><a href="{% url 'quiz_start' %}" class="{% if 'quiz' in request.resolver_match.url_name %}active{% endif %}">Quiz</a></li>
+      <li><a href="{% url 'company_list' %}" class="{% if 'company' in request.resolver_match.url_name %}active{% endif %}">Companies</a></li>
+      <li><a href="{% url 'leaderboard' %}" class="{% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">Leaderboard</a></li>
+      {% if user.is_authenticated %}
+      <li><a href="{% url 'bookmarks' %}" class="{% if request.resolver_match.url_name == 'bookmarks' %}active{% endif %}">Bookmarks</a></li>
+      {% endif %}
+    </ul>
+
+    <div class="nav-right">
+      {% if user.is_authenticated %}
+        {% if user.is_staff %}
+        <a href="{% url 'admin:index' %}" class="btn btn-sm btn-ghost" style="border:none;">Admin</a>
+        {% endif %}
+        <a href="{% url 'dashboard' %}" class="btn btn-sm btn-ghost" style="border:none;">Dashboard</a>
+        <a href="{% url 'profile' %}" class="btn btn-sm btn-ghost" style="border:none;">Profile</a>
+        <a href="{% url 'logout' %}" class="btn btn-sm btn-solid">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-sm btn-ghost">Login</a>
+        <a href="{% url 'signup' %}" class="btn btn-sm btn-solid">Sign Up</a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile fallback -->
+    <button class="hamburger" id="hamburger" aria-label="Menu" style="display:none;">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>

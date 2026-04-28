@@ -1,0 +1,74 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Quiz in Progress{% endblock %}
+{% block content %}
+<div class="quiz-header">
+  <div class="container flex-between">
+    <div>
+      <span class="text-muted">Question <strong id="q-current">1</strong> of {{ total_questions }}</span>
+    </div>
+    <div style="text-align:center;">
+      <div class="quiz-timer" id="quiz-timer">{{ time_limit }}:00</div>
+      <div class="progress-bar quiz-progress" style="width:200px;">
+        <div class="progress-bar-fill" id="timer-progress" style="width:100%;"></div>
+      </div>
+    </div>
+    <button onclick="confirmSubmit()" class="btn btn-danger btn-sm">Submit Quiz</button>
+  </div>
+</div>
+
+<div class="container" style="max-width:800px;">
+  <!-- Question Navigation -->
+  <div class="quiz-nav">
+    {% for question in questions %}
+    <button class="quiz-nav-btn" data-question-id="{{ question.id }}" onclick="showQuestion({{ forloop.counter0 }})">{{ forloop.counter }}</button>
+    {% endfor %}
+  </div>
+
+  <!-- Quiz Form -->
+  <form id="quiz-form" method="post" action="{% url 'quiz_submit' %}">
+    {% csrf_token %}
+    <input type="hidden" name="time_taken" id="time-taken-input" value="0">
+
+    {% for question in questions %}
+    <div class="quiz-question card" id="question-{{ forloop.counter0 }}" style="padding:2rem;">
+      <div class="q-meta mb-2">
+        <span class="badge badge-{{ question.difficulty }}">{{ question.difficulty }}</span>
+        <span class="badge" style="background:{{ question.category.color }}22;color:{{ question.category.color }};">{{ question.category.name }}</span>
+      </div>
+      <div class="q-text" style="font-size:1.1rem;margin-bottom:1.5rem;">{{ question.text }}</div>
+      <input type="hidden" name="question_{{ question.id }}" id="answer-{{ question.id }}" value="">
+      <ul class="options-list">
+        <li class="option-item" data-answer="a" onclick="selectAnswer('{{ question.id }}', 'a')">
+          <span class="option-letter">A</span><span>{{ question.option_a }}</span>
+        </li>
+        <li class="option-item" data-answer="b" onclick="selectAnswer('{{ question.id }}', 'b')">
+          <span class="option-letter">B</span><span>{{ question.option_b }}</span>
+        </li>
+        <li class="option-item" data-answer="c" onclick="selectAnswer('{{ question.id }}', 'c')">
+          <span class="option-letter">C</span><span>{{ question.option_c }}</span>
+        </li>
+        <li class="option-item" data-answer="d" onclick="selectAnswer('{{ question.id }}', 'd')">
+          <span class="option-letter">D</span><span>{{ question.option_d }}</span>
+        </li>
+      </ul>
+      <div class="flex-between mt-3">
+        {% if not forloop.first %}
+        <button type="button" class="btn btn-ghost btn-sm" onclick="prevQuestion()">← Previous</button>
+        {% else %}<span></span>{% endif %}
+        {% if not forloop.last %}
+        <button type="button" class="btn btn-primary btn-sm" onclick="nextQuestion()">Next →</button>
+        {% else %}
+        <button type="button" class="btn btn-success btn-sm" onclick="confirmSubmit()">Submit Quiz ✓</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'core/js/quiz.js' %}"></script>
+<script>initQuiz({{ total_questions }}, {{ time_limit }});</script>
+{% endblock %}

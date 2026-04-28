@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+{% block title %}{{ company.name }} Preparation{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header flex-between">
+      <div>
+        <h1>🏢 {{ company.name }}</h1>
+        <p>{{ total_questions }} question{{ total_questions|pluralize }} available</p>
+      </div>
+      <a href="{% url 'quiz_start' %}?company={{ company.slug }}" class="btn btn-primary">🎯 Start Mock Test</a>
+    </div>
+
+    {% if category_breakdown %}
+    <div class="grid-4 mb-3">
+      {% for cb in category_breakdown %}
+      <div class="card stat-card">
+        <div class="stat-value">{{ cb.count }}</div>
+        <div class="stat-label">{{ cb.category__name }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for question in questions %}
+    <a href="{% url 'question_detail' question.pk %}" class="card question-card" style="display:block;text-decoration:none;color:inherit;margin-bottom:.75rem;">
+      <div class="q-meta">
+        <span class="badge badge-{{ question.difficulty }}">{{ question.difficulty }}</span>
+        <span class="badge" style="background:{{ question.category.color }}22;color:{{ question.category.color }};">{{ question.category.name }}</span>
+      </div>
+      <div class="q-text">{{ question.text|truncatechars:150 }}</div>
+    </a>
+    {% endfor %}
+
+    {% if questions.has_other_pages %}
+    <div class="pagination">
+      {% if questions.has_previous %}<a href="?page={{ questions.previous_page_number }}">← Prev</a>{% endif %}
+      {% for num in questions.paginator.page_range %}
+        {% if questions.number == num %}<span class="current">{{ num }}</span>
+        {% elif num > questions.number|add:"-3" and num < questions.number|add:"3" %}
+        <a href="?page={{ num }}">{{ num }}</a>{% endif %}
+      {% endfor %}
+      {% if questions.has_next %}<a href="?page={{ questions.next_page_number }}">Next →</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

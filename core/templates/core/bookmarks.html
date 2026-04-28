@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+{% block title %}Bookmarks{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header">
+      <h1>⭐ Bookmarked Questions</h1>
+      <p>{{ bookmarks|length }} saved question{{ bookmarks|length|pluralize }}</p>
+    </div>
+    {% for bm in bookmarks %}
+    <a href="{% url 'question_detail' bm.question.pk %}" class="card question-card" style="display:block;text-decoration:none;color:inherit;margin-bottom:.75rem;">
+      <div class="q-meta">
+        <span class="badge badge-{{ bm.question.difficulty }}">{{ bm.question.difficulty }}</span>
+        <span class="badge" style="background:{{ bm.question.category.color }}22;color:{{ bm.question.category.color }};">{{ bm.question.category.name }}</span>
+      </div>
+      <div class="q-text">{{ bm.question.text|truncatechars:150 }}</div>
+      <div class="q-footer">
+        <span class="text-muted" style="font-size:.8rem;">Saved {{ bm.created_at|timesince }} ago</span>
+        <button class="bookmark-btn active" data-question-id="{{ bm.question.pk }}">★</button>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon">⭐</div>
+      <h3>No bookmarks yet</h3>
+      <p>Click the star icon on any question to save it for later</p>
+      <a href="{% url 'practice' %}" class="btn btn-primary mt-2">Browse Questions</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "core/base.html" %}
+{% block title %}Practice{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="container">
+    <div class="page-header flex-between">
+      <div>
+        <h1>📝 Practice Mode</h1>
+        <p>{{ total_results }} question{{ total_results|pluralize }} found</p>
+      </div>
+      <a href="{% url 'quiz_start' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}" class="btn btn-primary">🎯 Start Quiz</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <a href="{% url 'practice' %}" class="filter-chip {% if not active_category and not active_difficulty %}active{% endif %}">All</a>
+      {% for cat in categories %}
+      <a href="{% url 'practice' %}?category={{ cat.slug }}{% if active_difficulty %}&difficulty={{ active_difficulty }}{% endif %}" class="filter-chip {% if active_category.slug == cat.slug %}active{% endif %}">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+      <span style="color:var(--border);">|</span>
+      <a href="{% url 'practice' %}{% if active_category %}?category={{ active_category.slug }}&{% else %}?{% endif %}difficulty=easy" class="filter-chip {% if active_difficulty == 'easy' %}active{% endif %}">Easy</a>
+      <a href="{% url 'practice' %}{% if active_category %}?category={{ active_category.slug }}&{% else %}?{% endif %}difficulty=medium" class="filter-chip {% if active_difficulty == 'medium' %}active{% endif %}">Medium</a>
+      <a href="{% url 'practice' %}{% if active_category %}?category={{ active_category.slug }}&{% else %}?{% endif %}difficulty=hard" class="filter-chip {% if active_difficulty == 'hard' %}active{% endif %}">Hard</a>
+    </div>
+
+    <!-- Questions List -->
+    {% for question in questions %}
+    <a href="{% url 'question_detail' question.pk %}" class="card question-card" style="display:block;text-decoration:none;color:inherit;margin-bottom:.75rem;">
+      <div class="q-meta">
+        <span class="badge badge-{{ question.difficulty }}">{{ question.difficulty }}</span>
+        <span class="badge" style="background:{{ question.category.color }}22;color:{{ question.category.color }};">{{ question.category.name }}</span>
+      </div>
+      <div class="q-text">{{ question.text }}</div>
+      <div class="q-footer">
+        <div class="q-companies">
+          {% for company in question.companies.all %}
+          <span class="company-tag">{{ company.name }}</span>
+          {% endfor %}
+        </div>
+        {% if user.is_authenticated %}
+        <button class="bookmark-btn {% if question.pk in bookmarked_ids %}active{% endif %}" data-question-id="{{ question.pk }}" title="Bookmark">
+          {% if question.pk in bookmarked_ids %}★{% else %}☆{% endif %}
+        </button>
+        {% endif %}
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No questions found</h3>
+      <p>Try changing your filters</p>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if questions.has_other_pages %}
+    <div class="pagination">
+      {% if questions.has_previous %}
+      <a href="?page={{ questions.previous_page_number }}{% if active_category %}&category={{ active_category.slug }}{% endif %}{% if active_difficulty %}&difficulty={{ active_difficulty }}{% endif %}">← Prev</a>
+      {% endif %}
+      {% for num in questions.paginator.page_range %}
+        {% if questions.number == num %}
+        <span class="current">{{ num }}</span>
+        {% elif num > questions.number|add:"-3" and num < questions.number|add:"3" %}
+        <a href="?page={{ num }}{% if active_category %}&category={{ active_category.slug }}{% endif %}{% if active_difficulty %}&difficulty={{ active_difficulty }}{% endif %}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if questions.has_next %}
+      <a href="?page={{ questions.next_page_number }}{% if active_category %}&category={{ active_category.slug }}{% endif %}{% if active_difficulty %}&difficulty={{ active_difficulty }}{% endif %}">Next →</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
