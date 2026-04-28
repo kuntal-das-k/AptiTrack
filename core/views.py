@@ -70,6 +70,18 @@ def setup_view(request):
     except Exception as e:
         seed_output = f"Seed skipped: {e}"
 
+    # Create superuser if it doesn't exist
+    admin_output = ""
+    try:
+        from django.contrib.auth.models import User
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@aptitrack.com', 'admin123')
+            admin_output = "✅ Superuser 'admin' created (password: admin123)"
+        else:
+            admin_output = "ℹ️ Superuser 'admin' already exists"
+    except Exception as e:
+        admin_output = f"Admin creation error: {e}"
+
     html = f"""
     <html><head><title>AptiTrack Setup</title>
     <style>body{{background:#030303;color:#fff;font-family:monospace;padding:40px;}}
@@ -79,6 +91,7 @@ def setup_view(request):
     <h1>⚡ AptiTrack Setup Complete</h1>
     <h3>Migration Output:</h3><pre>{migrate_output}</pre>
     <h3>Seed Data Output:</h3><pre>{seed_output}</pre>
+    <h3>Admin Account:</h3><pre>{admin_output}</pre>
     <br><a href="/">→ Go to Homepage</a>
     </body></html>
     """
