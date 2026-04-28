@@ -1,12 +1,16 @@
 """
 Global template context processors for AptiTrack.
 """
-from .models import Category
 
 
 def global_context(request):
     """Add global data to all templates."""
+    try:
+        from .models import Category
+        categories = Category.objects.all()
+    except Exception:
+        categories = []
     return {
-        'categories': Category.objects.all(),
+        'categories': categories,
         'app_name': 'AptiTrack',
     }
