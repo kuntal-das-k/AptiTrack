@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       e.stopPropagation();
       const qid = this.dataset.questionId;
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value 
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+        || document.querySelector('[name=csrfmiddlewaretoken]')?.value 
         || getCookie('csrftoken');
       
       fetch(`/bookmark/${qid}/`, {

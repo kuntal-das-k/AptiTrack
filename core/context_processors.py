@@ -7,10 +7,10 @@ def global_context(request):
     """Add global data to all templates."""
     try:
         from .models import Category
-        categories = Category.objects.all()
+        nav_categories = Category.objects.all()
     except Exception:
-        categories = []
+        nav_categories = []
     return {
-        'categories': categories,
+        'nav_categories': nav_categories,
         'app_name': 'AptiTrack',
     }

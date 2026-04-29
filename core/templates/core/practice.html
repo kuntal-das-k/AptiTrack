@@ -14,7 +14,7 @@
     <!-- Filters -->
     <div class="filter-bar">
       <a href="{% url 'practice' %}" class="filter-chip {% if not active_category and not active_difficulty %}active{% endif %}">All</a>
-      {% for cat in categories %}
+      {% for cat in nav_categories %}
       <a href="{% url 'practice' %}?category={{ cat.slug }}{% if active_difficulty %}&difficulty={{ active_difficulty }}{% endif %}" class="filter-chip {% if active_category.slug == cat.slug %}active{% endif %}">{{ cat.icon }} {{ cat.name }}</a>
       {% endfor %}
       <span style="color:var(--border);">|</span>

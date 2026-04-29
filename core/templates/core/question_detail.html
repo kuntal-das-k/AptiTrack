@@ -79,7 +79,8 @@ let answered = false;
 function selectPracticeAnswer(answer, questionId) {
   if (answered) return;
   answered = true;
-  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    || document.querySelector('[name=csrfmiddlewaretoken]').value;
   
   // Highlight selected
   document.querySelectorAll('.option-item').forEach(o => o.style.pointerEvents = 'none');

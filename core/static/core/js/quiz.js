@@ -91,5 +91,9 @@ function submitQuiz() {
 }
 
 function confirmSubmit() {
-  submitQuiz();
+  const answered = Object.keys(answers).length;
+  const unanswered = totalQuestions - answered;
+  let msg = `Are you sure you want to submit?`;
+  if (unanswered > 0) msg += `\n\n⚠️ You have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}.`;
+  if (confirm(msg)) submitQuiz();
 }

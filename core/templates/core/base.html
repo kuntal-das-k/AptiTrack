@@ -7,6 +7,7 @@
   <title>{% block title %}AptiTrack{% endblock %} | Aptitude Practice Platform</title>
   <meta name="description" content="{% block meta_description %}Master aptitude with AptiTrack - Practice quantitative, logical, verbal & data interpretation questions.{% endblock %}">
   <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+  <meta name="csrf-token" content="{{ csrf_token }}">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -29,7 +30,6 @@
 
   {% include "core/partials/footer.html" %}
 
-  {% csrf_token %}
   <script src="{% static 'core/js/app.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>

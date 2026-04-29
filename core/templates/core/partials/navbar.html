@@ -8,8 +8,8 @@
 
     <ul class="nav-links" id="nav-links">
       <li><a href="{% url 'practice' %}" class="{% if request.resolver_match.url_name == 'practice' %}active{% endif %}">Practice</a></li>
-      <li><a href="{% url 'quiz_start' %}" class="{% if 'quiz' in request.resolver_match.url_name %}active{% endif %}">Quiz</a></li>
-      <li><a href="{% url 'company_list' %}" class="{% if 'company' in request.resolver_match.url_name %}active{% endif %}">Companies</a></li>
+      <li><a href="{% url 'quiz_start' %}" class="{% if request.resolver_match.url_name|default:'' and 'quiz' in request.resolver_match.url_name %}active{% endif %}">Quiz</a></li>
+      <li><a href="{% url 'company_list' %}" class="{% if request.resolver_match.url_name|default:'' and 'company' in request.resolver_match.url_name %}active{% endif %}">Companies</a></li>
       <li><a href="{% url 'leaderboard' %}" class="{% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">Leaderboard</a></li>
       {% if user.is_authenticated %}
       <li><a href="{% url 'bookmarks' %}" class="{% if request.resolver_match.url_name == 'bookmarks' %}active{% endif %}">Bookmarks</a></li>

@@ -2,6 +2,7 @@
 AptiTrack Views — All view functions for the platform.
 """
 import json
+import os
 import random
 from datetime import timedelta
 
@@ -9,9 +10,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 from django.db.models import Count, Avg, Q, Sum, F
+from django.db import OperationalError, ProgrammingError
 from django.core.paginator import Paginator
 
 from .models import (
@@ -36,7 +38,7 @@ def home_view(request):
             question_count=Count('questions')
         )[:8]
         top_users = UserProfile.objects.select_related('user').order_by('-total_xp')[:5]
-    except Exception:
+    except (OperationalError, ProgrammingError):
         # Tables don't exist yet — redirect to setup
         return redirect('setup')
 
@@ -53,6 +55,13 @@ def home_view(request):
 
 def setup_view(request):
     """Run migrations and seed data for first-time deployment."""
+    # Only allow in DEBUG mode or if ALLOW_SETUP env var is set
+    if not os.environ.get('ALLOW_SETUP') and not getattr(request, 'user', None) or (
+        hasattr(request, 'user') and request.user.is_authenticated and not request.user.is_staff
+    ):
+        from django.conf import settings
+        if not settings.DEBUG and not os.environ.get('ALLOW_SETUP'):
+            return HttpResponseForbidden('Setup is disabled in production.')
     from django.core.management import call_command
     from io import StringIO
     output = StringIO()
