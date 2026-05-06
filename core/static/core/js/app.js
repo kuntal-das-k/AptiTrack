@@ -3,8 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Mobile menu toggle
   const hamburger = document.querySelector('.hamburger');
   const navLinks = document.querySelector('.nav-links');
+  const navRight = document.querySelector('.nav-right');
   if (hamburger && navLinks) {
-    hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      if (navRight) navRight.classList.toggle('open');
+    });
   }
 
   // Auto-dismiss messages after 5s
